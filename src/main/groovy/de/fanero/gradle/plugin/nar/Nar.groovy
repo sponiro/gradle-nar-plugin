@@ -3,7 +3,7 @@ package de.fanero.gradle.plugin.nar
 import org.gradle.api.tasks.bundling.Jar
 
 /**
- * @author Robert Kühne
+ * @author Robert KÃ¼hne
  */
 class Nar extends Jar {
 

@@ -8,7 +8,7 @@ import org.gradle.api.plugins.BasePlugin
 import org.gradle.api.plugins.JavaPlugin
 
 /**
- * @author Robert Kühne
+ * @author Robert KÃ¼hne
  */
 class NarPlugin implements Plugin<Project> {
 
@@ -54,5 +54,7 @@ class NarPlugin implements Plugin<Project> {
                 }
             }
         }
+
+        project.tasks['assemble'].dependsOn(nar)
     }
 }
