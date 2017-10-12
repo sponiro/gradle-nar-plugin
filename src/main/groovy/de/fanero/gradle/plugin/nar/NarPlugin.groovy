@@ -8,7 +8,7 @@ import org.gradle.api.plugins.BasePlugin
 import org.gradle.api.plugins.JavaPlugin
 
 /**
- * @author Robert Kühne
+ * @author Robert KÃ¼hne
  */
 class NarPlugin implements Plugin<Project> {
 
@@ -38,7 +38,12 @@ class NarPlugin implements Plugin<Project> {
                 from(project.configurations.runtime, project.tasks.jar)
             }
             manifest {
-                attributes 'Nar-Id': project.name
+                attributes (
+						'Nar-Group': project.group,
+						'Nar-Id': project.name,
+						'Nar-Version': project.version)
+
+
             }
         }
 
@@ -50,7 +55,9 @@ class NarPlugin implements Plugin<Project> {
             if (conf.size() == 1) {
                 Dependency parent = conf.allDependencies.first()
                 manifest {
-                    attributes 'Nar-Dependency-Id': parent.name
+                    attributes( 'Nar-Dependency-Group': parent.group,
+								'Nar-Dependency-Id': parent.name,
+								'Nar-Dependency-Version': parent.version)
                 }
             }
         }
