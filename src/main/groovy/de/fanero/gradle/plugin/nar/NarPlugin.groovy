@@ -8,7 +8,7 @@ import org.gradle.api.plugins.BasePlugin
 import org.gradle.api.plugins.JavaPlugin
 
 /**
- * @author Robert K�hne
+ * @author Robert Kühne
  */
 class NarPlugin implements Plugin<Project> {
 
