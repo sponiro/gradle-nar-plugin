@@ -1,6 +1,5 @@
 package de.fanero.gradle.plugin.nar
 
-import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
@@ -103,39 +102,64 @@ dependencies {
                 .buildAndFail()
     }
 
-    def "test "() {
+    def "test bundled jar dependencies"() {
 
         buildFile << """
 repositories {
     mavenCentral()
 }
 dependencies {
-    nar 'org.apache.nifi:nifi-standard-services-api-nar:0.2.1'
+    compile group: 'commons-io', name: 'commons-io', version: '2.2'
 }
 """
-        expect:
+        when:
         GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
                 .withArguments('nar')
                 .withPluginClasspath()
                 .build()
+
+        then:
+        countBundledJars() == 3
+    }
+
+    int countBundledJars() {
+        int counter = 0
+        eachZipEntry {ZipInputStream zip, ZipEntry entry ->
+            if (entry.name.startsWith('META-INF/bundled-dependencies')) {
+                counter++
+            }
+            true
+        }
+        counter
     }
 
     Manifest extractManifest() {
         Manifest manifest = null
+        eachZipEntry { ZipInputStream zip, ZipEntry entry ->
+            if (entry.name == 'META-INF/MANIFEST.MF') {
+                manifest = new Manifest(zip)
+                return false
+            } else {
+                return true
+            }
+        }
+
+        manifest
+    }
+
+    private void eachZipEntry(Closure closure) {
         narFile().withInputStream {
             ZipInputStream zip = new ZipInputStream(it)
             ZipEntry entry = zip.nextEntry
             while (entry != null) {
-                if (entry.name == 'META-INF/MANIFEST.MF') {
-                    manifest = new Manifest(zip)
+                def result = closure(zip, entry)
+                if (!result) {
                     break
-                } else {
-                    entry = zip.nextEntry
                 }
+                entry = zip.nextEntry
             }
         }
-        manifest
     }
 
     private File narFile() {
