@@ -54,7 +54,9 @@ rootProject.name = "nar-test"
 
         then:
         manifest != null
+        manifest.getMainAttributes().getValue('Nar-Group') == 'de.fanero.test'
         manifest.getMainAttributes().getValue('Nar-Id') == 'nar-test'
+        manifest.getMainAttributes().getValue('Nar-Version') == '1.0'
         manifest.getMainAttributes().getValue('Nar-Dependency-Id') == null
     }
 
@@ -79,8 +81,12 @@ dependencies {
 
         then:
         manifest != null
+        manifest.getMainAttributes().getValue('Nar-Group') == 'de.fanero.test'
         manifest.getMainAttributes().getValue('Nar-Id') == 'nar-test'
+        manifest.getMainAttributes().getValue('Nar-Version') == '1.0'
+        manifest.getMainAttributes().getValue('Nar-Dependency-Group') == 'org.apache.nifi'
         manifest.getMainAttributes().getValue('Nar-Dependency-Id') == 'nifi-standard-services-api-nar'
+        manifest.getMainAttributes().getValue('Nar-Dependency-Version') == '0.2.1'
     }
 
     def "test multiple parent nar entries"() {
@@ -125,7 +131,7 @@ dependencies {
 
     int countBundledJars() {
         int counter = 0
-        eachZipEntry {ZipInputStream zip, ZipEntry entry ->
+        eachZipEntry { ZipInputStream zip, ZipEntry entry ->
             if (entry.name.startsWith('META-INF/bundled-dependencies')) {
                 counter++
             }

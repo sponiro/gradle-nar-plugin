@@ -40,11 +40,12 @@ class NarPlugin implements Plugin<Project> {
         nar.setDescription("Assembles a nar archive containing the main classes jar and the runtime configuration dependencies.")
         nar.setGroup(BasePlugin.BUILD_GROUP)
         nar.inputs.files(conf)
-        project.tasks[BasePlugin.ASSEMBLE_TASK_NAME].dependsOn(nar)
 
         configureBundledDependencies(project, nar)
         configureManifest(project, nar)
-        configureParentNarManifestEntry(nar, conf)
+        configureParentNarManifestEntry(project, nar, conf)
+
+        project.tasks[BasePlugin.ASSEMBLE_TASK_NAME].dependsOn(nar)
     }
 
     private void configureBundledDependencies(Project project, Nar nar) {
@@ -57,27 +58,36 @@ class NarPlugin implements Plugin<Project> {
     }
 
     private void configureManifest(Project project, Nar nar) {
-        nar.configure {
-            manifest {
-                attributes([
-                        (NarManifestEntry.NAR_ID.manifestKey): project.name
-                ])
+        project.afterEvaluate {
+            nar.configure {
+                manifest {
+                    attributes([
+                            (NarManifestEntry.NAR_GROUP.manifestKey)  : project.group,
+                            (NarManifestEntry.NAR_ID.manifestKey)     : project.name,
+                            (NarManifestEntry.NAR_VERSION.manifestKey): project.version
+                    ])
+                }
             }
         }
     }
 
-    private Task configureParentNarManifestEntry(Nar nar, conf) {
-        nar.doFirst {
-            if (conf.size() > 1) {
-                throw new RuntimeException("Only one parent nar dependency allowed in nar configuration but found ${conf.size()} configurations")
-            }
+    private Task configureParentNarManifestEntry(Project project, Nar nar, Configuration conf) {
+        project.afterEvaluate {
+            nar.configure {
+                if (conf.size() > 1) {
+                    throw new RuntimeException("Only one parent nar dependency allowed in nar configuration but found ${conf.size()} configurations")
+                }
 
-            if (conf.size() == 1) {
-                Dependency parentNarDependency = conf.allDependencies.first()
-                manifest {
-                    attributes([
-                            (NarManifestEntry.NAR_DEPENDENCY_ID.manifestKey): parentNarDependency.name
-                    ])
+                if (conf.size() == 1) {
+                    Dependency parentNarDependency = conf.allDependencies.first()
+
+                    manifest {
+                        attributes([
+                                (NarManifestEntry.NAR_DEPENDENCY_GROUP.manifestKey)  : parentNarDependency.group,
+                                (NarManifestEntry.NAR_DEPENDENCY_ID.manifestKey)     : parentNarDependency.name,
+                                (NarManifestEntry.NAR_DEPENDENCY_VERSION.manifestKey): parentNarDependency.version
+                        ])
+                    }
                 }
             }
         }
