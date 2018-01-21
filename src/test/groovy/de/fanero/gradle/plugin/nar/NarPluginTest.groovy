@@ -4,6 +4,7 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
+import spock.lang.Ignore
 import spock.lang.Specification
 
 /**
@@ -56,5 +57,15 @@ class NarPluginTest extends Specification {
 
         then:
         project.tasks['assemble'].dependsOn.find { it instanceof Task && it.name == 'nar' } != null
+    }
+
+    def "nar has no Nar-Dependency-Id when no nar dependency is set"() {
+
+        when:
+        project.apply plugin: PLUGIN
+
+        then:
+        Nar nar = project.tasks[NAR_TASK]
+        !nar.manifest.attributes.containsKey('Nar-Dependency-Id')
     }
 }
