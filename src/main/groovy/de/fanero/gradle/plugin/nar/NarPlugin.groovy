@@ -5,6 +5,7 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
+import org.gradle.api.java.archives.Attributes
 import org.gradle.api.plugins.BasePlugin
 import org.gradle.api.plugins.JavaPlugin
 
@@ -60,13 +61,10 @@ class NarPlugin implements Plugin<Project> {
     private void configureManifest(Project project, Nar nar) {
         project.afterEvaluate {
             nar.configure {
-                manifest {
-                    attributes([
-                            (NarManifestEntry.NAR_GROUP.manifestKey)  : project.group,
-                            (NarManifestEntry.NAR_ID.manifestKey)     : project.name,
-                            (NarManifestEntry.NAR_VERSION.manifestKey): project.version
-                    ])
-                }
+                Attributes attr = nar.manifest.attributes
+                attr.putIfAbsent(NarManifestEntry.NAR_GROUP.manifestKey, project.group)
+                attr.putIfAbsent(NarManifestEntry.NAR_ID.manifestKey, project.name)
+                attr.putIfAbsent(NarManifestEntry.NAR_VERSION.manifestKey, project.version)
             }
         }
     }
@@ -80,14 +78,10 @@ class NarPlugin implements Plugin<Project> {
 
                 if (conf.size() == 1) {
                     Dependency parentNarDependency = conf.allDependencies.first()
-
-                    manifest {
-                        attributes([
-                                (NarManifestEntry.NAR_DEPENDENCY_GROUP.manifestKey)  : parentNarDependency.group,
-                                (NarManifestEntry.NAR_DEPENDENCY_ID.manifestKey)     : parentNarDependency.name,
-                                (NarManifestEntry.NAR_DEPENDENCY_VERSION.manifestKey): parentNarDependency.version
-                        ])
-                    }
+                    Attributes attr = nar.manifest.attributes
+                    attr.putIfAbsent(NarManifestEntry.NAR_DEPENDENCY_GROUP.manifestKey, parentNarDependency.group)
+                    attr.putIfAbsent(NarManifestEntry.NAR_DEPENDENCY_ID.manifestKey, parentNarDependency.name)
+                    attr.putIfAbsent(NarManifestEntry.NAR_DEPENDENCY_VERSION.manifestKey, parentNarDependency.version)
                 }
             }
         }

@@ -129,6 +129,40 @@ dependencies {
         countBundledJars() == 3
     }
 
+    def "test override of manifest configuration"() {
+
+        buildFile << """
+repositories {
+    mavenCentral()
+}
+dependencies {
+    nar 'org.apache.nifi:nifi-standard-services-api-nar:0.2.1'
+}
+nar {
+    manifest {
+        attributes 'Nar-Group': 'group-override', 'Nar-Id': 'id-override', 'Nar-Version': 'version-override'
+        attributes 'Nar-Dependency-Group': 'Nar-Dependency-Group-override', 'Nar-Dependency-Id': 'Nar-Dependency-Id-override', 'Nar-Dependency-Version': 'Nar-Dependency-Version-override'
+    }
+}
+"""
+        when:
+        GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withArguments('nar')
+                .withPluginClasspath()
+                .build()
+
+        Manifest manifest = extractManifest()
+
+        then:
+        manifest.getMainAttributes().getValue('Nar-Group') == 'group-override'
+        manifest.getMainAttributes().getValue('Nar-Id') == 'id-override'
+        manifest.getMainAttributes().getValue('Nar-Version') == 'version-override'
+        manifest.getMainAttributes().getValue('Nar-Dependency-Group') == 'Nar-Dependency-Group-override'
+        manifest.getMainAttributes().getValue('Nar-Dependency-Id') == 'Nar-Dependency-Id-override'
+        manifest.getMainAttributes().getValue('Nar-Dependency-Version') == 'Nar-Dependency-Version-override'
+    }
+
     int countBundledJars() {
         int counter = 0
         eachZipEntry { ZipInputStream zip, ZipEntry entry ->
