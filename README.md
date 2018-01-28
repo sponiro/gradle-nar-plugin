@@ -50,6 +50,12 @@ dependencies {
 
 If you add more than one dependency, it will complain and crash the build.
 
+## Manifest
+
+The manifest of a nar file contains properties to identify it and a parent nar.
+This plugin configures the manifest generation to contain the values from the project name, group and version.
+The same goes for the nar parent.
+
 ### Service Locator
 
 Apache nifi uses the [ServiceLocator](http://docs.oracle.com/javase/7/docs/api/java/util/ServiceLoader.html) to define processors. The [Processor API](https://nifi.apache.org/docs/nifi-docs/html/developer-guide.html#processor_api)
