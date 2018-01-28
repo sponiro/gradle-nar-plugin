@@ -2,10 +2,7 @@ package de.fanero.gradle.plugin.nar
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.artifacts.Dependency
-import org.gradle.api.java.archives.Attributes
 import org.gradle.api.plugins.BasePlugin
 import org.gradle.api.plugins.JavaPlugin
 
@@ -43,47 +40,16 @@ class NarPlugin implements Plugin<Project> {
         nar.inputs.files(conf)
 
         configureBundledDependencies(project, nar)
-        configureManifest(project, nar)
-        configureParentNarManifestEntry(project, nar, conf)
+        configureParentNarManifestEntry(nar, conf)
 
         project.tasks[BasePlugin.ASSEMBLE_TASK_NAME].dependsOn(nar)
     }
 
     private void configureBundledDependencies(Project project, Nar nar) {
-        nar.configure {
-            into('META-INF/bundled-dependencies') {
-                // todo make hardcoded dependency resolution configurable
-                from(project.configurations.runtime, project.tasks[JavaPlugin.JAR_TASK_NAME])
-            }
-        }
+        nar.bundledDependencies = [project.configurations.runtime, project.tasks[JavaPlugin.JAR_TASK_NAME]]
     }
 
-    private void configureManifest(Project project, Nar nar) {
-        project.afterEvaluate {
-            nar.configure {
-                Attributes attr = nar.manifest.attributes
-                attr.putIfAbsent(NarManifestEntry.NAR_GROUP.manifestKey, project.group)
-                attr.putIfAbsent(NarManifestEntry.NAR_ID.manifestKey, project.name)
-                attr.putIfAbsent(NarManifestEntry.NAR_VERSION.manifestKey, project.version)
-            }
-        }
-    }
-
-    private Task configureParentNarManifestEntry(Project project, Nar nar, Configuration conf) {
-        project.afterEvaluate {
-            nar.configure {
-                if (conf.size() > 1) {
-                    throw new RuntimeException("Only one parent nar dependency allowed in nar configuration but found ${conf.size()} configurations")
-                }
-
-                if (conf.size() == 1) {
-                    Dependency parentNarDependency = conf.allDependencies.first()
-                    Attributes attr = nar.manifest.attributes
-                    attr.putIfAbsent(NarManifestEntry.NAR_DEPENDENCY_GROUP.manifestKey, parentNarDependency.group)
-                    attr.putIfAbsent(NarManifestEntry.NAR_DEPENDENCY_ID.manifestKey, parentNarDependency.name)
-                    attr.putIfAbsent(NarManifestEntry.NAR_DEPENDENCY_VERSION.manifestKey, parentNarDependency.version)
-                }
-            }
-        }
+    private void configureParentNarManifestEntry(Nar nar, Configuration conf) {
+        nar.parentNarConfiguration = conf
     }
 }

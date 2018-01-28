@@ -3,7 +3,7 @@
 A gradle plugin to create nar files for [Apache nifi](http://nifi.apache.org).
 
 ## Installation
-To use the plugin, add the bintray repository to your script:
+To use the plugin, add the bintray repository to your script and add the plugin dependency:
 
 ```groovy
 buildscript {
@@ -14,7 +14,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath group: 'de.fanero.gradle.plugin.nar', name: 'gradle-nar-plugin', version: '0.1'
+        classpath group: 'de.fanero.gradle.plugin.nar', name: 'gradle-nar-plugin', version: '0.2'
     }
 }
 
@@ -26,16 +26,20 @@ Run `gradle nar` to execute the nar task and create a nar archive.
 
 ## Configuration
 
-This plugin depends on the JavaPlugin. If it does not exist it will add it to the build.
+This plugin depends on the JavaPlugin.
+If it does not exist it will add it to the build.
 
 ### Nar Task
-It adds a new preconfigured task of type Nar named `nar` to the project. The Nar task extends the Jar class and can be modified
-as such. The task is configured to add all runtime dependencies to the archive. Also the jar, from the output of the `jar` task,
-is added to the archive.
+It adds a new preconfigured task of type Nar named `nar` to the project.
+The Nar task extends the Jar class and can be modifiedas such.
+The task is configured to add all runtime dependencies to the archive.
+Also the jar, from the output of the `jar` task, is added to the archive.
 
 ### Nar Parent
-Nar archives can have a parent nar. The parent is optional and there can be at maximum one parent. The parent relationship
-is added to the manifest. To tell the plugin to add a parent you have to add a nar dependency to the nar configuration.
+Nar archives can have a parent nar.
+The parent is optional and there can be at maximum one parent.
+The parent relationship is added to the manifest.
+To tell the plugin to add a parent you have to add a nar dependency to the nar configuration.
 The nar configuration is added by the plugin. Add the parent nar like this:
 
 ```groovy

@@ -6,6 +6,7 @@ import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
 import java.util.jar.Manifest
+import java.util.regex.Pattern
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
@@ -126,7 +127,7 @@ dependencies {
                 .build()
 
         then:
-        countBundledJars() == 3
+        countBundledJars() == 2
     }
 
     def "test override of manifest configuration"() {
@@ -163,10 +164,68 @@ nar {
         manifest.getMainAttributes().getValue('Nar-Dependency-Version') == 'Nar-Dependency-Version-override'
     }
 
+    def "test override bundled dependencies"() {
+        buildFile << """
+nar {
+    bundledDependencies = [jar]
+}
+"""
+        when:
+        GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withArguments('nar')
+                .withPluginClasspath()
+                .build()
+
+        then:
+        countBundledJars() == 1
+    }
+
+    def "test empty bundled dependencies"() {
+        buildFile << """
+nar {
+    bundledDependencies = null
+}
+"""
+        when:
+        GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withArguments('nar')
+                .withPluginClasspath()
+                .build()
+
+        then:
+        countBundledJars() == 0
+    }
+
+    def "test remove parent configuration"() {
+        buildFile << """
+nar {
+    parentNarConfiguration = null
+}
+"""
+        when:
+        GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withArguments('nar')
+                .withPluginClasspath()
+                .build()
+
+        Manifest manifest = extractManifest()
+
+        then:
+        countBundledJars() == 1
+        manifest.getMainAttributes().getValue('Nar-Dependency-Group') == null
+        manifest.getMainAttributes().getValue('Nar-Dependency-Id') == null
+        manifest.getMainAttributes().getValue('Nar-Dependency-Version') == null
+    }
+
     int countBundledJars() {
         int counter = 0
+        Pattern pattern = Pattern.compile('^META-INF/bundled-dependencies/.+$')
         eachZipEntry { ZipInputStream zip, ZipEntry entry ->
-            if (entry.name.startsWith('META-INF/bundled-dependencies')) {
+            if (pattern.matcher(entry.name).matches()) {
+                println entry.name
                 counter++
             }
             true
