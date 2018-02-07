@@ -29,6 +29,7 @@ class NarPlugin implements Plugin<Project> {
 
     private Configuration createNarConfiguration(Project project) {
         Configuration narConfiguration = project.configurations.create(NAR_CONFIGURATION)
+        project.configurations.compileOnly.extendsFrom(project.configurations.nar)
         narConfiguration.transitive = false
         narConfiguration
     }
