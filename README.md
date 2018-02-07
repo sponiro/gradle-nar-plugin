@@ -14,7 +14,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath group: 'de.fanero.gradle.plugin.nar', name: 'gradle-nar-plugin', version: '0.2'
+        classpath group: 'de.fanero.gradle.plugin.nar', name: 'gradle-nar-plugin', version: '0.3'
     }
 }
 
@@ -30,17 +30,17 @@ This plugin depends on the JavaPlugin.
 If it does not exist it will add it to the build.
 
 ### Nar Task
-It adds a new preconfigured task of type Nar named `nar` to the project.
-The Nar task extends the Jar class and can be modifiedas such.
-The task is configured to add all runtime dependencies to the archive.
-Also the jar, from the output of the `jar` task, is added to the archive.
+The plugin adds a new preconfigured task of type Nar named `nar` to the project.
+The Nar class extends Jar and can be modified as such.
+The task is configured to add all runtime dependencies and the jar archive itself to the nar archive.
 
 ### Nar Parent
 Nar archives can have a parent nar.
 The parent is optional and there can be at maximum one parent.
 The parent relationship is added to the manifest.
 To tell the plugin to add a parent you have to add a nar dependency to the nar configuration.
-The nar configuration is added by the plugin. Add the parent nar like this:
+The nar configuration is created by the plugin.
+Add the parent nar like this:
 
 ```groovy
 dependencies {
@@ -52,9 +52,46 @@ If you add more than one dependency, it will complain and crash the build.
 
 ## Manifest
 
-The manifest of a nar file contains properties to identify it and a parent nar.
+The manifest of a nar file contains properties to identify the nar file and a parent nar.
 This plugin configures the manifest generation to contain the values from the project name, group and version.
 The same goes for the nar parent.
+
+### Default manifest values
+
+Manifest Property Key | Value
+--- | ---
+Nar-Group | project.group
+Nar-Id | project.name
+Nar-Version | project.version
+Nar-Dependency-Group | nar config group
+Nar-Dependency-Id | nar config name
+Nar-Dependency-Version | nar config version
+
+### Override manifest values
+The plugin respects manifest overrides from the user.
+For example:
+
+```groovy
+nar {
+    manifest {
+        attributes 'Nar-Group': 'overriden-nar-group-value'
+    }
+}
+```
+
+A full description can be found at https://docs.gradle.org/current/userguide/java_plugin.html#sec:jar.
+
+## Shortcomings
+
+Version 0.1 and 0.2 do not add the parent nar in the nar configuration to the dependencies.
+To fix this you can either use version 0.3 or add the following code to your build:
+
+```groovy
+configurations {
+    compileOnly.extendsFrom(configurations.nar)
+}
+```
+
 
 ### Service Locator
 
