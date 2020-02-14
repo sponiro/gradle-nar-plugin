@@ -19,7 +19,7 @@ class Nar extends Jar {
     Configuration parentNarConfiguration
 
     Nar() {
-        extension = 'nar'
+        archiveExtension.set('nar')
         bundledDependencies = []
         configureBundledDependencies()
         configureManifest()

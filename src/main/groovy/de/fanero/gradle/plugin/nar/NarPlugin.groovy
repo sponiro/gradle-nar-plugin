@@ -36,7 +36,7 @@ class NarPlugin implements Plugin<Project> {
 
     private void createNarTask(Project project, Configuration conf) {
         Nar nar = project.tasks.create(NAR_TASK_NAME, Nar)
-        nar.setDescription("Assembles a nar archive containing the main classes jar and the runtime configuration dependencies.")
+        nar.setDescription("Assembles a nar archive containing the main classes jar and the runtimeClasspath configuration dependencies.")
         nar.setGroup(BasePlugin.BUILD_GROUP)
         nar.inputs.files(conf)
 
@@ -47,7 +47,7 @@ class NarPlugin implements Plugin<Project> {
     }
 
     private void configureBundledDependencies(Project project, Nar nar) {
-        nar.bundledDependencies = [project.configurations.runtime, project.tasks[JavaPlugin.JAR_TASK_NAME]]
+        nar.bundledDependencies = [project.configurations.runtimeClasspath, project.tasks[JavaPlugin.JAR_TASK_NAME]]
     }
 
     private void configureParentNarManifestEntry(Nar nar, Configuration conf) {
