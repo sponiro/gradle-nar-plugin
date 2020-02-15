@@ -67,8 +67,8 @@ gradlePlugin {
 }
 
 task sourceJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+    from sourceSets.main.allSource
 }
 
 publishing {
@@ -100,10 +100,6 @@ publishing {
                 rkuehne.appendNode('id', 'rkuehne')
                 rkuehne.appendNode('name', 'Robert Kühne')
                 rkuehne.appendNode('email', 'sponiro@gmail.com')
-                def lwinderling = developers.appendNode('developer')
-                lwinderling.appendNode('id', 'lwinderling')
-                lwinderling.appendNode('name', 'Lars Winderling')
-                lwinderling.appendNode('email', 'lars.winderling@performance-advertising.de')
             }
         }
     }
@@ -121,9 +117,4 @@ bintray {
         licenses = ['Apache-2.0']
         vcsUrl = 'https://github.com/sponiro/gradle-nar-plugin'
     }
-}
-
-wrapper {
-    gradleVersion = rootProject.ext.gradleVersion
-    distributionUrl = "https://services.gradle.org/distributions/gradle-${rootProject.ext.gradleVersion}-all.zip"
 }

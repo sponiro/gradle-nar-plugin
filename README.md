@@ -100,3 +100,8 @@ explains in detail how this works. Basically, you have to add a file in `META-IN
 `org.apache.nifi.processor.Processor`. This text file contains a fully-qualified class names of your processors.
 One per line.
 
+# Contributions
+
+## Version 0.4
+
+Thanks to [Lars Winderling](https://github.com/kaHaleMaKai) for making the plugin ready for Gradle 6.
